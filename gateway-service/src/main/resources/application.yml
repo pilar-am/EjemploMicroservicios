@@ -1,0 +1,35 @@
+#spring.profiles.active: local
+server:
+  port: 8080
+  #ssl:
+  #  enabled: true # Uses self-signed certificate because no key-store configuration is specified.
+
+internal.lb.uri: http://localhost
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: clientes
+          uri: ${internal.lb.uri}:9002
+          predicates:
+            - Path=/api/clientes**
+          filters:
+            - RewritePath=/(?<path>.*), /$\{path}
+        - id: empleados
+          uri: ${internal.lb.uri}:9001
+          predicates:
+            - Path=/api/empleados**
+          filters:
+            - RewritePath=/(?<path>.*), /$\{path}
+        - id: proveedores
+          uri: ${internal.lb.uri}:9003
+          predicates:
+            - Path=/api/proveedores**
+          filters:
+            - RewritePath=/(?<path>.*), /$\{path}
+        - id: webapp
+          uri: ${internal.lb.uri}:9004
+          predicates:
+            - Path=/**
+          filters:
+            - RewritePath=/(?<path>.*), /$\{path}
